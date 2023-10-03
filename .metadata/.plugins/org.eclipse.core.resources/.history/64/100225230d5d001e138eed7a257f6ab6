@@ -1,0 +1,219 @@
+package Laboral;
+
+
+import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.sound.midi.Soundbank;
+
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+/**
+ * La clase CalculaNominas calcula y muestra información relacionada los
+ * empleados y sus respectivos sueldos.
+ */
+class CalculaNominas {
+
+	/**
+	 * El main crea empleados, realiza operaciones sobre ellos y muestra información
+	 * de sus sueldos.
+	 * 
+	 * @throws DatosNoCorrectosException
+	 *
+	 * 
+	 */
+
+	public static void main(String[] args) throws DatosNoCorrectosException {
+
+		try {
+
+			// Crear dos Empleado con información respectiva pedida en el ejercicio.
+			Empleado e1 = new Empleado("James Colling", "32000032G,", "M", 4, 7);
+			Empleado e2 = new Empleado("Ada Lovelace", "32000031R,", "F");
+
+			// Muestra información sobre los empleados.
+			escribe(e1);
+			escribe(e2);
+			System.out.println("----------------------------");
+
+			// Realizar cambios pedidos en el ejercicio.
+
+			e2.incrAnyo();
+			e1.setCategoria(9);
+			escribe(e2);
+			escribe(e1);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
+
+		System.out.println("----------------------------------------------");
+
+		/**
+		 * Lee los datos de empleados desde un archivo de texto, calcula los sueldos y
+		 * los almacena en un archivo binario. Luego, muestra los sueldos calculados.
+		 *
+		 */
+
+//		List<Empleado> listaEmpleados = new ArrayList<Empleado>();
+//
+//		try {
+//			//Abre el archivo de empleados para lectura
+//			BufferedReader br = new BufferedReader(new FileReader(
+//				"D:\\Desarrollo_web_entorno_servidor\\GestionDeNominasNuevo\\src\\main\\java\\Laboral\\empleado.txt"));
+//
+//	String linea;
+//		
+//		 Lee cada línea del archivo
+//		while ((linea = br.readLine()) != null) {
+//			String[] campos = linea.split(",");
+//			if (campos.length == 5) {
+//					String nombre = campos[0].trim();
+//
+//					String dni = campos[1].trim();
+//
+//					String sexo = campos[2].trim();
+//
+//					int categoria = Integer.parseInt(campos[3].trim());
+//
+//					int anyos = Integer.parseInt(campos[4].trim());
+//
+//					Empleado empleado = new Empleado(nombre, sexo, dni, categoria, anyos);
+//
+//					listaEmpleados.add(empleado);
+//
+//				}
+//
+//			}
+//
+//			br.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//
+//		 Calcular sueldos y escribir en el archivo binario "salarios.dat"
+//		try {
+//			ObjectOutputStream outputStream = new ObjectOutputStream(new FileOutputStream(
+//					"D:\\Desarrollo_web_entorno_servidor\\GestionDeNominasNuevo\\src\\main\\java\\Laboral\\salarios.dat"));
+//
+//			for (Empleado empleado : listaEmpleados) {
+//
+//				int sueldo = Nomina.sueldo(empleado);
+//				String dni = empleado.dni;
+//				outputStream.writeUTF(dni);
+//				outputStream.writeInt(sueldo);
+//
+//			}
+//			outputStream.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//
+//		try {
+//			 Abre el archivo binario para lectura
+//			ObjectInputStream inputStream = new ObjectInputStream(new FileInputStream(
+//					"D:\\Desarrollo_web_entorno_servidor\\GestionDeNominasNuevo\\src\\main\\java\\Laboral\\salarios.dat"));
+//			while (true) {
+//				try {
+//					String dni = inputStream.readUTF();
+//					int sueldo = inputStream.readInt();
+//					System.out.println("El Dni del empleado es : " + dni + ", El sueldo del empleado es : " + sueldo);
+//				} catch (EOFException e) {
+//					// Se llegó al final del archivo
+//					break;
+//				}
+//			}
+//			inputStream.close();
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//		}
+//		
+
+		// Conexion a base de datos
+		
+//		 final String USER = "root";
+//	        final String PASS = "123456";
+//	        final String DB_NAME = "laboral";
+//	        final String CONN_URL = "jdbc:mariadb://localhost:3306/" + DB_NAME;
+//	        Connection conn = null;
+//
+//	        try {
+//	            conn = DriverManager.getConnection(CONN_URL, USER, PASS);
+//	            System.out.println("Conexión válida: " + conn.isValid(10));
+//	            System.out.println("Estado del autocommit: " + conn.getAutoCommit());
+//	        } catch (SQLException e) {
+//	            System.out.println("Ocurrió una excepción al conectar a la BD");
+//	        } finally {
+//	            try {
+//	                if (conn != null) {
+//	                    conn.close();
+//	                }
+//	            } catch (SQLException ex) {
+//	                System.out.println("Ocurrió una excepción al cerrar la BD");
+//	            }
+//	        }
+//	    }
+			     
+//	     4.5. Incremente los años trabajados del segundo empleado y haga que la categoría
+//	     del primero sea 9.
+		
+		Connection conn = null;
+		Statement st = null;
+
+		try {
+			conn = DBUtils.getConnection();
+			st = conn.createStatement();
+			
+			ResultSet incrementoAño = st.executeQuery("UPDATE empleados SET anyos= anyos+1 where dni ='32000031R';");
+
+
+			ResultSet resulset = st.executeQuery(" select * from empleados ");
+
+			while (resulset.next()) {
+				String nombre = resulset.getString("nombre");
+				String anyos= resulset.getString("anyos");
+				System.out.println(nombre);
+
+			}
+
+		} catch (SQLException e) {
+			System.out.println("Ocurrió algún error al conectar u operar con la BD");
+		} finally {
+			try {
+				DBUtils.close(st);
+				DBUtils.close(conn);
+			} catch (SQLException e) {
+				System.out.println("Ocurrió una excepción al cerrar la BD");
+			}
+		}
+	           
+	}
+	       
+	
+	        
+	    
+
+	
+
+	/**
+	 * Muestra información sobre un empleado
+	 *
+	 * @param e1 mostrará la información.
+	 */
+
+	private static void escribe(Empleado e1) {
+		e1.imprime();
+		System.out.println("Sueldo " + Nomina.sueldo(e1));
+		System.out.println("------------");
+
+	}
+
+}
